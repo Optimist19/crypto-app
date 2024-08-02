@@ -453,7 +453,7 @@ function Home() {
               onChange={handleSearchChange}
             />
           </div>
-          <div className="w-[80vw] bg-white h-[50vh] rounded-md overflow-y-auto overscroll-contain py-3">
+          <div className="w-[80vw] bg-white h-[50vh] rounded-md overflow-y-auto overscroll-contain py-3 text-black">
             {/* <h3>Default symbol</h3> */}
             <div className="py-3">
               {cryptPairSearchResult?.map((crypto, i) => {
