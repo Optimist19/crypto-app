@@ -9,6 +9,7 @@ import { loader as cryptoDetailsLoader } from "./components/CryptoDetails";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
+import PageNotFound from "./components/PageNotFound";
 
 function App() {
   const queryClient = new QueryClient();
@@ -16,13 +17,16 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Home />
+      element: <Home />,
+      errorElement: <PageNotFound />,
     },
     {
       path: "path/:name",
       element: <CryptoDetails />,
       loader: cryptoDetailsLoader
-    }
+    },
+    {
+    },
   ]);
 
   return (

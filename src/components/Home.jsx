@@ -1,5 +1,4 @@
-
-import { useEffect, useState, useRef, memo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCrypt } from "../services/api";
 import { Input } from "./ui/input";
@@ -16,7 +15,7 @@ import { data as cryptoPairs } from "@/data";
 function Home() {
   const [text, setText] = useState("");
   const [searchedArr, setSearchArr] = useState([]);
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
   const [performance, setPerformance] = useState("");
   const container = useRef();
   const [isLight, setIsLight] = useState("light");
@@ -29,6 +28,11 @@ function Home() {
   const [brokerName, setBrokerName] = useState("NASDAQ");
   const [pairedCode, setPairedCode] = useState("AAPL");
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["crypoData"],
+    queryFn: getCrypt
+  });
+
   //   useEffect(() => {
   //     const interval = setInterval(() => {
   //         setCount(count + 1);
@@ -36,11 +40,6 @@ function Home() {
 
   //     return () => clearInterval(interval);
   // }, [count]);
-
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["crypoData"],
-    queryFn: getCrypt
-  });
 
   // useEffect(() => {
   //   const script = document.createElement("script");
@@ -75,11 +74,11 @@ function Home() {
   // console.log(searchedArr, "searchedArr");
 
 
-
   useEffect(() => {
     if (container.current) {
       const script = document.createElement("script");
-      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+      script.src =
+        "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
       script.type = "text/javascript";
       script.async = true;
       script.innerHTML = JSON.stringify({
@@ -97,12 +96,10 @@ function Home() {
         support_host: "https://www.tradingview.com"
       });
 
-
       container.current.innerHTML = "";
       container.current.appendChild(script);
 
       return () => {
-
         if (container.current) {
           container.current.innerHTML = "";
         }
@@ -122,6 +119,7 @@ function Home() {
       )
     );
   }
+
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
@@ -160,6 +158,7 @@ function Home() {
     }
   }
 
+  
   const allData =
     Array.isArray(data) &&
     data.map((obj) => {
@@ -200,6 +199,8 @@ function Home() {
         </div>
       );
     });
+
+
   const lowPerformanceData =
     Array.isArray(searchedArr) &&
     searchedArr.map((obj) => {
@@ -240,6 +241,8 @@ function Home() {
         </div>
       );
     });
+
+
   const highPerformanceData =
     Array.isArray(searchedArr) &&
     searchedArr.map((obj) => {
@@ -389,7 +392,9 @@ function Home() {
         <div className="px-3">
           <div>
             <div className="flex flex-col  gap-3 my-4 sm:flex-row">
-              <select onChange={(e) => setIsLight(e.target.value)} className="text-black">
+              <select
+                onChange={(e) => setIsLight(e.target.value)}
+                className="text-black">
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
               </select>
@@ -413,7 +418,9 @@ function Home() {
               </div>
             </div>
             <div className="my-4">
-              <Input type="text" value={pairedCode}
+              <Input
+                type="text"
+                value={pairedCode}
                 placeholder="Search symbol"
                 onClick={() => setModal(true)}
               />
@@ -477,4 +484,3 @@ function Home() {
 }
 
 export default Home;
-
