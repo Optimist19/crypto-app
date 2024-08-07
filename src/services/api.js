@@ -13,6 +13,8 @@ export async function getCrypt() {
   return data;
 }
 
+
+
 export async function historyChart(name) {
   const res = await fetch(`https://api.coingecko.com/api/v3/coins/${name}/market_chart?vs_currency=usd&days=7`)
 

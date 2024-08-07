@@ -12,10 +12,16 @@ import { ImCancelCircle } from "react-icons/im";
 
 import { data as cryptoPairs } from "@/data";
 
+// import {Stack} from "@mui/material/Stack";
+import Badge from "@mui/material/Badge";
+import MailIcon from "@mui/icons-material/Mail";
+// import { MailLock } from "@mui/icons-material";
+// import { Stack } from "@mui/system";
+
 function Home() {
   const [text, setText] = useState("");
   const [searchedArr, setSearchArr] = useState([]);
-  // const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0);
   const [performance, setPerformance] = useState("");
   const container = useRef();
   const [isLight, setIsLight] = useState("light");
@@ -27,19 +33,32 @@ function Home() {
   const [modal, setModal] = useState(false);
   const [brokerName, setBrokerName] = useState("NASDAQ");
   const [pairedCode, setPairedCode] = useState("AAPL");
+  const [news, setNews] = useState([]);
+  const [newsModal, setNewsModal] = useState(false);
+  const [messageIcon, setMessageIcon] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["crypoData"],
     queryFn: getCrypt
   });
 
-  //   useEffect(() => {
-  //     const interval = setInterval(() => {
-  //         setCount(count + 1);
-  //     }, 5000);
+  const fetchCryptoNews = async () => {
+    const response = await fetch(
+      "https://newsdata.io/api/1/latest?apikey=pub_5003626ffc65be9b566bcfbbe8d13663b5474"
+    );
+    const data = await response.json();
+    setNews(data.results);
+    setMessageIcon(false);
+  };
 
-  //     return () => clearInterval(interval);
-  // }, [count]);
+  useEffect(() => {
+    fetchCryptoNews();
+    const interval = setInterval(() => {
+      setCount(count + 1);
+      messageIcon(true);
+    }, 50000);
+    return () => clearInterval(interval);
+  }, [count]);
 
   // useEffect(() => {
   //   const script = document.createElement("script");
@@ -72,7 +91,6 @@ function Home() {
   // console.log(count, "count");
 
   // console.log(searchedArr, "searchedArr");
-
 
   useEffect(() => {
     if (container.current) {
@@ -107,7 +125,6 @@ function Home() {
     }
   }, [isLight, showDrawingToolsBar, details, pairedCode, brokerName]);
 
-
   function handleChange(e) {
     setText(e.target.value);
 
@@ -120,6 +137,7 @@ function Home() {
     );
   }
 
+  // console.log(news);
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
@@ -141,15 +159,15 @@ function Home() {
     // setPerformance(e.target.value);
     if (e.target.value === "high") {
       setPerformance(e.target.value);
-      console.log("first");
+      // console.log("first");
       setSearchArr(data.filter((obj) => obj.market_cap_rank <= 10));
       // console.log(searchedArr, "data[10]");
     } else if (e.target.value === "low") {
       setPerformance(e.target.value);
 
-      console.log("second");
+      // console.log("second");
       setSearchArr(data.filter((obj) => obj.market_cap_rank > 90));
-      console.log("second2");
+      // console.log("second2");
     } else if (e.target.value === "all") {
       setPerformance(e.target.value);
       setSearchArr(data);
@@ -158,7 +176,16 @@ function Home() {
     }
   }
 
-  
+  function messageIconFtn() {
+    setMessageIcon(!messageIcon);
+    setNewsModal(true);
+  }
+
+  function closeNewsModalFtn() {
+    setMessageIcon(true);
+    setNewsModal(false);
+  }
+
   const allData =
     Array.isArray(data) &&
     data.map((obj) => {
@@ -199,7 +226,6 @@ function Home() {
         </div>
       );
     });
-
 
   const lowPerformanceData =
     Array.isArray(searchedArr) &&
@@ -242,7 +268,6 @@ function Home() {
       );
     });
 
-
   const highPerformanceData =
     Array.isArray(searchedArr) &&
     searchedArr.map((obj) => {
@@ -284,10 +309,9 @@ function Home() {
       );
     });
 
-  // console.log(performance, "performance");
-  console.log(pairedCode, "pairedCode");
-  console.log(brokerName, "brokerName");
-  // console.log(performance, "performance");
+  // // console.log(performance, "performance");
+  // console.log(pairedCode, "pairedCode");
+  // console.log(brokerName, "brokerName");
 
   return (
     <div className="background">
@@ -308,8 +332,20 @@ function Home() {
               <option value="low">Low performance</option>
             </select>
           </div>
+          <div>
+            {messageIcon ? (
+              <Badge color="secondary">
+                <MailIcon className="cursor-pointer" />
+              </Badge>
+            ) : (
+              <Badge color="secondary" variant="dot" onClick={messageIconFtn}>
+                <MailIcon className="cursor-pointer" />
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
+
       {text === "" ? (
         <div>
           {isLoading ? (
@@ -444,6 +480,8 @@ function Home() {
         </div>
       </div>
 
+      {/* crypto pairs */}
+
       {modal && (
         <div className="flex justify-center items-center flex-col fixed top-0 left-0 right-0 bottom-0 py-[3vh] background-c">
           <div
@@ -476,6 +514,38 @@ function Home() {
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* news */}
+
+      {newsModal && (
+        <div
+          className="h-[100vh] bg-[rgb(0,0,0)] fixed top-0 bottom-0 right-0 left-0 flex justify-center items-center text-green-800"
+          onClick={closeNewsModalFtn}>
+          <div className="h-[60vh] overflow-y-auto overscroll-contain">
+            <h2 className="text-2xl text-center">Crypto News</h2>
+            {news.map((obj) => {
+              return (
+                <a href={`${obj.link}`} target="_blank" key={obj.article_id}>
+                  <div className="flex justify-between items-center gap-3 py-2 px-2">
+                    <div>
+                      <p>{obj.title}</p>
+                      <p>{obj.pubDate}</p>
+                    </div>
+
+                    <div className="w-[7vw]">
+                      <img
+                        src={obj.image_url}
+                        alt="news-image"
+                        className="w-[100%] rounded-md"
+                      />
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { historyChart } from "@/services/api";
+// import { historyChart } from "@/services/api";
 
 function CryptoDetails() {
   return <div></div>;
